@@ -1,14 +1,36 @@
 from typing import Optional
 
 from fastapi import FastAPI
-
+from pydantic import BaseModel
 app = FastAPI()
 
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+class Persona(BaseModel):
+    id: str
+    nombre: str
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Optional[str] = None):
-    return {"item_id": item_id, "q": q}
+persona = Persona(id="1", nombre="Juan")
+
+@app.get("/")
+async def ruta():
+    """Hola esto es una documentación"""
+    return {"message": "Hola mundo"}
+
+@app.get("/objeto/{objeto_id}")
+def ruta_con_parametro(
+        objeto_id: int, #valor de la ruta
+        q: Optional[str] = None # Parametro de la ruta
+    ):
+    print(objeto_id)
+    print(q)
+    return {"objeto_id": objeto_id}
+
+@app.get("/persona/", response_model=Persona)
+def ruta_con_modelo():
+    return persona
+
+@app.post("/persona/", response_model=Persona)
+def ruta_con_modelo_post(nueva_persona: Persona):
+    global persona
+    persona = nueva_persona
+    return persona
